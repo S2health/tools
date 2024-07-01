@@ -9,6 +9,6 @@ if [[ $# -ne 1 ]]; then
 	exit 1
 fi
 
-s2 data instances -s S2-models-demo/opts -o S2-test-data/synth -f $1 -n 10 -b S2-BMM
+s2 data instances -s S2-models-demo/opts -o S2-test-data/synth -f $1 -n 10
 
 
