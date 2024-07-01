@@ -1,0 +1,56 @@
+#!/bin/bash
+#
+# Extract from master spreadsheet, in CSV form, the following fields 
+#	4 - LOINC code
+#   	9 - archetype id
+#	10 - id-code within archetype
+#
+# and write to a CSV in the order 10, 6, 4
+#
+# Performs a rudimentary handling of fields containing commas and quoted by double quotes
+# Writes output to  the file mentioned in outfile variable below
+#
+#
+
+USAGE="USAGE: `basename $0` CSV_in_file"
+if [ $# -ne 1 ]; then
+	echo $USAGE
+	exit 1
+fi
+
+lib_id=S2-models-demo
+outdir=$lib_id/injection
+outfile=S2-loinc_inject.csv
+outpath=$outdir/$outfile
+tmpfile=$TEMP/`basename $0`-$$.tmp
+
+if [ ! -d "$outdir" ]; then
+	echo $outdir does not exist; executing from correct location?
+	exit 1
+fi
+
+> $tmpfile
+while read -r line
+	do
+		# use this for backslash quoting
+		# qline="${line//\\,/XXXX}"
+
+		# the following will catch two commas in a quoted field
+		qline=`echo $line | sed -e 's/,"\(.*\),\(.*\)",/,"\1XXXX\2",/' -e 's/,"\(.*\),\(.*\)",/,"\1XXXX\2",/'`
+		loinc_code=`echo "$qline" | cut -d',' -f4`
+
+		# ignore long strings which are GUIDs
+		if [ ${#loinc_code} -lt 8 ]; then
+			arch_id=`echo "$qline" | cut -d',' -f9`
+			arch_code=`echo "$qline" | cut -d',' -f10`
+
+			new="$arch_id,$arch_code,$loinc_code" 
+			#
+			# use this for backslash quoting
+			# echo "${new//XXXX/\\,}" >> $outfile
+			echo "${new//XXXX/,}" >> $tmpfile
+		fi
+	done < "$1"
+
+sort -u $tmpfile > $outpath
+echo "Created $outpath"

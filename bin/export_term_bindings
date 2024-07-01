@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+# model command to be executed in the directory 'Graphite', containing Graphite Health cloned repos.
+#
+
+lib_id=S2-models-demo
+adlc --cfg cfg/adlc.cfg -b $lib_id --export_term_bindings -o $lib_id/term_bindings > $lib_id/logs/`basename $0`.log 2>&1

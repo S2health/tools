@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# model command to be executed in the directory 'Graphite', containing Graphite Health cloned repos.
+#
+
+build_adl_repo S2-models-demo 45
+
+
