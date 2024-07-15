@@ -31,7 +31,7 @@ terminology_profile = <
 --
 archetype_parent_class = <"Locatable">
 archetype_data_value_parent_class = <"Data_value">
-archetype_visualise_descendants_of = <"Item">
+archetype_visualise_descendants_of = <"Node">
 
 ----------------------------------------------------------------------------------------
 -- mappings from AOM built-in types used for RM types
@@ -78,8 +78,8 @@ aom_rm_type_substitutions = <
 	["DURATION"] = <"String">
 	["TERMINOLOGY_CODE"] = <"Terminology_term">
 	["INTEGER"] = <"Real">
-	["REAL"] = <"Double">
-	["Real"] = <"Double">
+	["REAL"] = <"Decimal">
+	["Real"] = <"Decimal">
 >
 
 ----------------------------------------------------------------------------------------
