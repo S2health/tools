@@ -60,6 +60,7 @@ aom_rm_type_mappings = <
 rm_primitive_type_equivalences = <
 	["Byte"] = <"Integer">
 	["Double"] = <"Real">
+	["Decimal"] = <"Real">
 	["Uri"] = <"String">
 	["Integer64"] = <"Integer">
 >
