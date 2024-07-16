@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+# model command to be executed in the directory containing cloned repos
+#
+
+lib_id=S2-models-demo
+adlc --cfg tools/cfg/adlc.cfg -b $lib_id --export -o S2-exported/$lib_id/json/flat > S2-exported/$lib_id/logs/`basename $0`.log 2>&1
