@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# model command to be executed in root directory containing S2 cloned repos.
+#
+
+src=S2-CEM-staging
+tgt=S2-models-demo
+cp -R $src/models/archetypes/Node/Lab/Lab-* $tgt/models/archetypes/Node/Lab
+
+

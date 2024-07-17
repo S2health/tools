@@ -30,8 +30,8 @@ if [ $? -ne 0 ] || [ ! -w $log_dir ]; then
 fi
 
 # look for 'errors=N' and get the N; make sure it is less than the threshold $errs_max
-echo "adlc --cfg cfg/adlc.cfg -b $lib_id --build > $log_file 2>&1"
-adlc --cfg cfg/adlc.cfg -b $lib_id --build > $log_file 2>&1
+echo "adlc --cfg tools/cfg/adlc.cfg -b $lib_id --build"
+adlc --cfg tools/cfg/adlc.cfg -b $lib_id --build > $log_file 2>&1
 
 err_count=`sed -n 's/^.*errors=\([0-9]*\).*$/\1/p' $log_file`
 if [ $err_count -lt $errs_max ]; then

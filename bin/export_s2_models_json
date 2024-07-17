@@ -4,4 +4,15 @@
 #
 
 lib_id=S2-models-demo
-adlc --cfg tools/cfg/adlc.cfg -b $lib_id --export -o S2-exported/$lib_id/json/flat > S2-exported/$lib_id/logs/`basename $0`.log 2>&1
+log_dir=S2-exported/$lib_id/logs
+
+# create log dir if it does not exist
+mkdir -p $log_dir
+if [ $? -ne 0 ] || [ ! -w $log_dir ]; then
+	echo "Logs dir $log_dir doesn't exist or not writable"
+	exit 1
+fi
+
+# main command
+echo "adlc --cfg tools/cfg/adlc.cfg -b $lib_id --export --flat -f json -o S2-exported/$lib_id/json/flat"
+adlc --cfg tools/cfg/adlc.cfg -b $lib_id --export --flat -f json -o S2-exported/$lib_id/json/flat > $log_dir/`basename $0`.log 2>&1
