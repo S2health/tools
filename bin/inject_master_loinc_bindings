@@ -1,11 +1,11 @@
 #!/bin/bash
 #
-# model command to be executed from above the directory 'Graphite', containing Graphite Health cloned repos.
+# command to be executed from root directory containing S2 Health cloned repos.
 #
 
 repo_id=S2-models-demo
 terminology=loinc
 
-echo "adlc -q -b $repo_id --inject_term_bindings $terminology -i $repo_id/injection/${terminology}_master.csv > $repo_id/logs/inject_${terminology}.log 2>&1"
-adlc -q -b $repo_id --inject_term_bindings ${terminology} -i $repo_id/injection/${terminology}.csv > $repo_id/logs/inject_${terminology}.log 2>&1
+echo "adlc -q --cfg tools/cfg/adlc.cfg -b $repo_id --inject_term_bindings ${terminology} -i $repo_id/injection/${terminology}_master.csv > $repo_id/logs/inject_${terminology}.log 2>&1"
+adlc -q --cfg tools/cfg/adlc.cfg -b $repo_id --inject_term_bindings ${terminology} -i $repo_id/injection/${terminology}.csv > $repo_id/logs/inject_${terminology}.log 2>&1
 

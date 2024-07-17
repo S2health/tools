@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# model command to be executed from above the directory 'Graphite', containing Graphite Health cloned repos.
+# command to be executed from root directory containing S2 Health cloned repos.
 #
 
 lib_id=S2-models-demo
@@ -8,7 +8,7 @@ lib_id=S2-models-demo
 terminologies=( loinc rxnorm openehr s2 snomed ucum )
 
 for i in "${terminologies[@]}" ; do
-	echo "adlc -q --cfg cfg/adlc.cfg -b $lib_id --inject_term_bindings $i -i $lib_id/injection/${i}_bindings.csv > $lib_id/logs/inject_${i}.log"
-	adlc -q --cfg cfg/adlc.cfg -b $lib_id --inject_term_bindings $i -i $lib_id/injection/${i}_bindings.csv > $lib_id/logs/inject_${i}.log 2>&1
+	echo "adlc -q --cfg tools/cfg/adlc.cfg -b $lib_id --inject_term_bindings $i -i $lib_id/injection/${i}_bindings.csv > $lib_id/logs/inject_${i}.log"
+	adlc -q --cfg tools/cfg/adlc.cfg -b $lib_id --inject_term_bindings $i -i $lib_id/injection/${i}_bindings.csv > $lib_id/logs/inject_${i}.log 2>&1
 done
 

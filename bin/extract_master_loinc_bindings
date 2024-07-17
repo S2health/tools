@@ -2,7 +2,7 @@
 #
 # Extract from master spreadsheet, in CSV form, the following fields 
 #	4 - LOINC code
-#   	9 - archetype id
+#   9 - archetype id
 #	10 - id-code within archetype
 #
 # and write to a CSV in the order 10, 6, 4
