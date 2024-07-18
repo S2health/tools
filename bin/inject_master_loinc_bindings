@@ -5,7 +5,8 @@
 
 repo_id=S2-models-demo
 terminology=loinc
+log_file=$repo_id/logs/inject_${terminology}.log
 
-echo "adlc -q --cfg tools/cfg/adlc.cfg -b $repo_id --inject_term_bindings ${terminology} -i $repo_id/injection/${terminology}_master.csv > $repo_id/logs/inject_${terminology}.log 2>&1"
-adlc -q --cfg tools/cfg/adlc.cfg -b $repo_id --inject_term_bindings ${terminology} -i $repo_id/injection/${terminology}.csv > $repo_id/logs/inject_${terminology}.log 2>&1
+echo "adlc -q --cfg tools/cfg/adlc.cfg -b $repo_id --inject_term_bindings ${terminology} -i $repo_id/injection/${terminology}_master.csv"  > $log_file
+adlc -q --cfg tools/cfg/adlc.cfg -b $repo_id --inject_term_bindings ${terminology} -i $repo_id/injection/${terminology}.csv >> $log_file 2>&1
 

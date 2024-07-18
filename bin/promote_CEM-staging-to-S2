@@ -5,6 +5,9 @@
 
 src=S2-CEM-staging
 tgt=S2-models-demo
+
+# since source area might contain deletions, we wipe out the target first
+rm -rf $tgt/models/archetypes/Node/Lab/Lab-*
 cp -R $src/models/archetypes/Node/Lab/Lab-* $tgt/models/archetypes/Node/Lab
 
 

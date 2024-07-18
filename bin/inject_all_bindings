@@ -4,11 +4,11 @@
 #
 
 lib_id=S2-models-demo
-
 terminologies=( loinc rxnorm openehr s2 snomed ucum )
 
 for i in "${terminologies[@]}" ; do
-	echo "adlc -q --cfg tools/cfg/adlc.cfg -b $lib_id --inject_term_bindings $i -i $lib_id/injection/${i}_bindings.csv > $lib_id/logs/inject_${i}.log"
-	adlc -q --cfg tools/cfg/adlc.cfg -b $lib_id --inject_term_bindings $i -i $lib_id/injection/${i}_bindings.csv > $lib_id/logs/inject_${i}.log 2>&1
+	log_file=$lib_id/logs/inject_${i}.log
+	echo "adlc -q --cfg tools/cfg/adlc.cfg -b $lib_id --inject_term_bindings $i -i $lib_id/injection/${i}_bindings.csv" > $log_file
+	adlc -q --cfg tools/cfg/adlc.cfg -b $lib_id --inject_term_bindings $i -i $lib_id/injection/${i}_bindings.csv >> $log_file 2>&1
 done
 

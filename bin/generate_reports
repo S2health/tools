@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# model command to be executed in root directory containing S2 Health cloned repos.
+#
+
+lib_id=S2-models-demo
+log_file=lib_id/logs/`basename $0`.log
+
+echo "adlc --cfg tools/cfg/adlc.cfg -b $lib_id -f csv --report -o $lib_id/reports"  > $log_file
+adlc --cfg tools/cfg/adlc.cfg -b $lib_id -f csv --report -o $lib_id/reports >> $log_file 2>&1
