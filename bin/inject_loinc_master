@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# command to be executed from root directory containing S2 Health cloned repos.
+#
+
+repo_id=S2-models-demo
+terminology=loinc
+log_file=$repo_id/logs/inject_${terminology}.log
+
+echo "adlc -q --cfg tools/cfg/adlc.cfg -b $repo_id --inject_term_bindings ${terminology} -i $repo_id/injection/${terminology}_master.csv" > $log_file
+adlc -q --cfg tools/cfg/adlc.cfg -b $repo_id --inject_term_bindings ${terminology} -i $repo_id/injection/${terminology}_master.csv >> $log_file 2>&1
+
