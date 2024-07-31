@@ -20,7 +20,7 @@ fi
 
 lib_id=S2-models-demo
 outdir=$lib_id/injection
-outfile=S2-loinc_inject.csv
+outfile=loinc_master.csv
 outpath=$outdir/$outfile
 tmpfile=$TEMP/`basename $0`-$$.tmp
 
