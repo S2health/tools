@@ -12,23 +12,29 @@
 #
 #
 
-USAGE="USAGE: `basename $0` CSV_in_file"
-if [ $# -ne 1 ]; then
-	echo $USAGE
+USAGE="USAGE: `basename $0`"
+
+src_repo=S2-terminology
+infile=S2_Elements-LOINC_Extension_map_master.csv
+inpath=$src_repo/LOINC/$infile
+
+if [ ! -r "$inpath" ]; then
+	echo "$inpath does not exist; $src_repo cloned?"
 	exit 1
 fi
 
-lib_id=S2-models-demo
-outdir=$lib_id/injection
+tgt_lib_id=S2-models-demo
+outdir=$tgt_lib_id/injection
 outfile=loinc_master.csv
 outpath=$outdir/$outfile
-tmpfile=/tmp/`basename $0`-$$.tmp
+
 
 if [ ! -d "$outdir" ]; then
 	echo $outdir does not exist; executing from correct location?
 	exit 1
 fi
 
+tmpfile=/tmp/`basename $0`-$$.tmp
 > $tmpfile
 while read -r line
 	do
@@ -50,7 +56,7 @@ while read -r line
 			# echo "${new//XXXX/\\,}" >> $outfile
 			echo "${new//XXXX/,}" >> $tmpfile
 		#fi
-	done < "$1"
+	done < $inpath
 
 sort -u $tmpfile > $outpath
 echo "Created $outpath"
