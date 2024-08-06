@@ -30,7 +30,7 @@ outpath=$outdir/$outfile
 
 
 if [ ! -d "$outdir" ]; then
-	echo $outdir does not exist; executing from correct location?
+	echo "$outdir does not exist; executing from correct location?"
 	exit 1
 fi
 
