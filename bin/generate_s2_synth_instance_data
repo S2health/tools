@@ -9,4 +9,4 @@ if [[ $# -ne 1 ]]; then
 	exit 1
 fi
 
-s2_linux_x86 data instances -s S2-models-demo/opts -o S2-test-data/synth -f $1 -n 10 -t S2-terminology --formulas S2-data-synth-formulas
+s2_linux_x86 data instances -s S2-models-demo/opts -o S2-test-data/synth -f $1 -n 10 -t S2-terminology --formulas S2-data-synth-formulas --log ./logs/generate_s2_synth_instance_data.log
