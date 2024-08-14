@@ -8,7 +8,11 @@ terminologies=( loinc rxnorm openehr s2 snomed ucum )
 
 for i in "${terminologies[@]}" ; do
 	log_file=$lib_id/logs/inject_${i}.log
-	echo "adlc -q --cfg tools/cfg/adlc.cfg -b $lib_id --inject_term_bindings $i -i $lib_id/injection/${i}_bindings.csv" > $log_file
-	adlc -q --cfg tools/cfg/adlc.cfg -b $lib_id --inject_term_bindings $i -i $lib_id/injection/${i}_bindings.csv >> $log_file 2>&1
+	bindings_src=$lib_id/term_bindings/${i}_bindings.csv
+	
+	if [ -r $bindings_src ]; then
+		echo "adlc -q --cfg tools/cfg/adlc.cfg -b $lib_id --inject_term_bindings $i -i $bindings_src" > $log_file
+		adlc -q --cfg tools/cfg/adlc.cfg -b $lib_id --inject_term_bindings $i -i $bindings_src >> $log_file 2>&1
+	fi
 done
 

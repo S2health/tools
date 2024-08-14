@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# Generate instance data for OPTs.
+#
+USAGE="$0 <run_00N>"
+
+if [[ $# -ne 1 ]]; then
+	echo $USAGE
+	exit 1
+fi
+
+lib_repo=S2-models-demo
+out_repo=S2-test-data
+s2_linux_x86 data instances -s $lib_repo/opts -o $out_repo/synth -f $1 -n 1 -t S2-terminology --formulas S2-data-synth-formulas --fixed --log $out_repo/logs/generate_s2_synth_instance_data_fixed.log
+

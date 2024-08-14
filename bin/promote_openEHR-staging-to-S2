@@ -3,11 +3,11 @@
 # model command to be executed in root directory containing S2 cloned repos.
 #
 
-src=S2-CEM-staging
-src_dir=$src/models/archetypes/Node/Lab
+src=S2-openEHR-staging
+src_dir=$src/models/archetypes
 
 tgt=S2-models-demo
-tgt_dir=$tgt/models/archetypes/Node/Lab
+tgt_dir=$tgt/models/archetypes
 
 if [ ! -d $src_dir ]; then
 	echo "Source directory $src_dir doesn't exist"
@@ -19,8 +19,9 @@ if [ ! -d $tgt_dir ]; then
 	exit 1
 fi
 
-# since source area might contain deletions, we wipe out the target first
-rm -rf $tgt_dir/Lab-*
-cp -R $src_dir/Lab-* $tgt_dir
+cp -R $src_dir/* $tgt_dir
 
+
+# Now inject all bindings since openEHR archetypes don't have them
+inject_all_bindings
 
