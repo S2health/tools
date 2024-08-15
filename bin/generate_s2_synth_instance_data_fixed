@@ -2,14 +2,16 @@
 #
 # Generate instance data for OPTs.
 #
-USAGE="$0 <run_00N>"
+default_run_id=run_009
 
 if [[ $# -ne 1 ]]; then
-	echo $USAGE
-	exit 1
+	echo "Using default run $default_run_id"
+	run_id=$default_run_id
+else
+	run_id=$1
 fi
 
 lib_repo=S2-models-demo
 out_repo=S2-test-data
-s2_linux_x86 data instances -s $lib_repo/opts -o $out_repo/synth -f $1 -n 1 -t S2-terminology --formulas S2-data-synth-formulas --fixed --log $out_repo/logs/generate_s2_synth_instance_data_fixed.log
 
+s2_linux_x86 data instances -s $lib_repo/opts -o $out_repo/synth -f $run_id -n 10 -t S2-terminology --formulas S2-data-synth-formulas --fixed --log $out_repo/logs/`basename $0`.log
