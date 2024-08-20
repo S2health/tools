@@ -1,0 +1,74 @@
+name: 'Create PR'
+description: 'Run scripts and create PRs'
+inputs:
+  branch_name:
+    description: Name of the branch to be created in the current repo
+    required: true
+  current_repo_name:
+    description: Name of the current repo or repo that causes the trigger event
+    required: false
+    default: ${{ github.event.repository.name }}
+  scripts_list:
+    description: A list of scripts that needs to be run in the format "['script1', 'script2']"
+    required: true
+  target_repo_name:
+    description: Name of the target repo to create the git branch and PR
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get current date  
+      id: date
+      shell: bash
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d_%H_%M')"
+    
+    - name: Create a new branch in $TARGET_REPO
+      working-directory: ./$TARGET_REPO
+      shell: bash
+      run: git checkout -b $BRANCH_NAME-$DATETIME
+      env:
+        BRANCH_NAME: ${{ inputs.branch_name }}
+        TARGET_REPO: ${{ inputs.target_repo_name }}
+        DATETIME: ${{ steps.date.outputs.date }}
+
+    - name: Run scripts
+      working-directory: ./
+      shell: bash
+      run: |
+        export ${{ vars.S2_TOOLS_PATH }}
+        for script in ${{ fromJson(inputs.scripts_list) }}
+        do
+          echo "$script"
+          bash ./tools/bin/$script
+        done
+
+    - name: Push the new branch with changes after running scripts
+      working-directory: ./$TARGET_REPO
+      shell: bash
+      run: |
+        git add --all
+        git commit -m "Github Actions script runner"
+        git push -f origin $BRANCH_NAME-$DATETIME
+      env:
+        BRANCH_NAME: ${{ inputs.branch_name }}
+        TARGET_REPO: ${{ inputs.target_repo_name }}
+        DATETIME: ${{ steps.date.outputs.date }}
+
+    - name: Create a PR in $TARGET_REPO repo
+      working-directory: ./$TARGET_REPO
+      shell: bash
+      run: |
+        echo "${{ secrets.GIT_PERSONAL_ACCESS_TOKEN }}" > token.txt
+
+        gh auth login --with-token < token.txt
+        gh pr create \
+          --body "Auto PR created from change in $CURRENT_REPO repo" \
+          --title "$BRANCH_NAME-$DATETIME" \
+          --head "$BRANCH_NAME-$DATETIME" \
+          --base "main"
+      env:
+        BRANCH_NAME: ${{ inputs.branch_name }}
+        CURRENT_REPO: ${{ inputs.current_repo_name }}
+        TARGET_REPO: ${{ inputs.target_repo_name }}
+        DATETIME: ${{ steps.date.outputs.date }}
