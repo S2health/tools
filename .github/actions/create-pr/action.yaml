@@ -29,56 +29,46 @@ runs:
       shell: bash
       run: echo "::set-output name=date::$(date +'%Y-%m-%d_%H_%M')"
     
-    - name: Create a new branch in $TARGET_REPO
-      working-directory: ./$TARGET_REPO
+    - name: Create a new branch in ${{ inputs.target_repo_name }}
+      working-directory: ./${{ inputs.target_repo_name }}
       shell: bash
-      run: git checkout -b $BRANCH_NAME-$DATETIME
+      run: git checkout -b ${{ inputs.branch_name }}-$DATETIME
       env:
-        BRANCH_NAME: ${{ inputs.branch_name }}
-        TARGET_REPO: ${{ inputs.target_repo_name }}
         DATETIME: ${{ steps.date.outputs.date }}
 
     - name: Run scripts
       working-directory: ./
       shell: bash
       run: |
-        export $S2_TOOLS_PATH
+        export ${{ inputs.s2_tools_path }}
         echo $PATH
         for script in ${{ fromJson(inputs.scripts_list) }}
         do
           echo "$script"
           bash ./tools/bin/$script
         done
-      env:
-        S2_TOOLS_PATH: ${{ inputs.s2_tools_path }}
 
     - name: Push the new branch with changes after running scripts
-      working-directory: ./$TARGET_REPO
+      working-directory: ./${{ inputs.target_repo_name }}
       shell: bash
       run: |
         git add --all
         git commit -m "Github Actions script runner"
-        git push -f origin $BRANCH_NAME-$DATETIME
+        git push -f origin ${{ inputs.branch_name }}-$DATETIME
       env:
-        BRANCH_NAME: ${{ inputs.branch_name }}
-        TARGET_REPO: ${{ inputs.target_repo_name }}
         DATETIME: ${{ steps.date.outputs.date }}
 
-    - name: Create a PR in $TARGET_REPO repo
-      working-directory: ./$TARGET_REPO
+    - name: Create a PR in ${{ inputs.target_repo_name }} repo
+      working-directory: ./${{ inputs.target_repo_name }}
       shell: bash
       run: |
-        echo "$PERSONAL_ACCESS_TOKEN" > token.txt
+        echo "${{ inputs.git_pat }}" > token.txt
 
         gh auth login --with-token < token.txt
         gh pr create \
-          --body "Auto PR created from change in $CURRENT_REPO repo" \
-          --title "$BRANCH_NAME-$DATETIME" \
-          --head "$BRANCH_NAME-$DATETIME" \
+          --body "Auto PR created from change in ${{ inputs.current_repo_name }} repo" \
+          --title "${{ inputs.branch_name }}-$DATETIME" \
+          --head "${{ inputs.branch_name }}-$DATETIME" \
           --base "main"
       env:
-        BRANCH_NAME: ${{ inputs.branch_name }}
-        CURRENT_REPO: ${{ inputs.current_repo_name }}
-        PERSONAL_ACCESS_TOKEN: ${{ inputs.git_pat }}
-        TARGET_REPO: ${{ inputs.target_repo_name }}
         DATETIME: ${{ steps.date.outputs.date }}
