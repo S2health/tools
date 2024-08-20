@@ -8,6 +8,12 @@ inputs:
     description: Name of the current repo or repo that causes the trigger event
     required: false
     default: ${{ github.event.repository.name }}
+  git_pat:
+    description: Github Personal Access Token
+    required: true
+  s2_tools_path:
+    description: The PATH to set to run scripts in tools repo
+    required: true
   scripts_list:
     description: A list of scripts that needs to be run in the format "['script1', 'script2']"
     required: true
@@ -36,12 +42,15 @@ runs:
       working-directory: ./
       shell: bash
       run: |
-        export ${{ vars.S2_TOOLS_PATH }}
+        export $S2_TOOLS_PATH
+        echo $PATH
         for script in ${{ fromJson(inputs.scripts_list) }}
         do
           echo "$script"
           bash ./tools/bin/$script
         done
+      env:
+        S2_TOOLS_PATH: ${{ inputs.s2_tools_path }}
 
     - name: Push the new branch with changes after running scripts
       working-directory: ./$TARGET_REPO
@@ -59,7 +68,7 @@ runs:
       working-directory: ./$TARGET_REPO
       shell: bash
       run: |
-        echo "${{ secrets.GIT_PERSONAL_ACCESS_TOKEN }}" > token.txt
+        echo "$PERSONAL_ACCESS_TOKEN" > token.txt
 
         gh auth login --with-token < token.txt
         gh pr create \
@@ -70,5 +79,6 @@ runs:
       env:
         BRANCH_NAME: ${{ inputs.branch_name }}
         CURRENT_REPO: ${{ inputs.current_repo_name }}
+        PERSONAL_ACCESS_TOKEN: ${{ inputs.git_pat }}
         TARGET_REPO: ${{ inputs.target_repo_name }}
         DATETIME: ${{ steps.date.outputs.date }}
