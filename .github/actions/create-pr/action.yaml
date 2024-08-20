@@ -42,7 +42,7 @@ runs:
       run: |
         export ${{ inputs.s2_tools_path }}
         echo $PATH
-        readarray -d ' ' arr <<< ${{ inputs.scripts_list }})
+        readarray -d ' ' arr <<< ${{ inputs.scripts_list }}
         for script in "${arr[@]}"; do
           echo "$script"
           bash ./tools/bin/$script
