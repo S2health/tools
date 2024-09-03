@@ -8,6 +8,8 @@ out_repo=S2-exported
 log_dir=$out_repo/$lib_id/logs
 log_file=$log_dir/`basename $0`.log
 
+out_path=$out_repo/$lib_id/json/flat
+
 # create log dir if it does not exist
 mkdir -p $log_dir
 if [ $? -ne 0 ] || [ ! -w $log_dir ]; then
@@ -15,10 +17,14 @@ if [ $? -ne 0 ] || [ ! -w $log_dir ]; then
 	exit 1
 fi
 
-# main command
-echo "adlc --cfg tools/cfg/adlc.cfg -b $lib_id --export --flat -f json -o $out_repo/$lib_id/json/flat" > $log_file
-adlc --cfg tools/cfg/adlc.cfg -b $lib_id --export --flat -f json -o $out_repo/$lib_id/json/flat >> $log_file 2>&1
+# clean the target location
+rm -f $out_path/*.json
 
+# main command - writes out all flat-form archetypes, and templates in flat (but not OPT) form
+echo "adlc --cfg tools/cfg/adlc.cfg -b $lib_id --export --flat -f json -o $out_path" > $log_file
+adlc --cfg tools/cfg/adlc.cfg -b $lib_id --export --flat -f json -o $out_path >> $log_file 2>&1
+
+# run again, but write out templates in OPT form; overwrites the flat form, which no-one uses
 echo >> $log_file
-echo "adlc --cfg tools/cfg/adlc.cfg -b $lib_id --export --opts --flat -f json -o S$out_repo/$lib_id/json/flat" >> $log_file
-adlc --cfg tools/cfg/adlc.cfg -b $lib_id --export --opts --flat -f json -o $out_repo/$lib_id/json/flat >> $log_file 2>&1
+echo "adlc --cfg tools/cfg/adlc.cfg -b $lib_id --export --opts --flat -f json -o $out_path" >> $log_file
+adlc --cfg tools/cfg/adlc.cfg -b $lib_id --export --opts --flat -f json -o $out_path >> $log_file 2>&1
