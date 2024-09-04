@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# model command to be executed in root directory containing S2 Health cloned repos.
+#
+
+src_repo=S2-models-demo
+tgt_repo=S2-models
+out_path=$src_repo/reports
+log_file=$src_repo/logs/`basename $0`.log
+
+echo "adlc --cfg tools/cfg/adlc.cfg -b $src_repo --gen_opts_copy_script --target_repo $tgt_repo -o $out_path" > $log_file
+adlc --cfg tools/cfg/adlc.cfg -b $src_repo --gen_opts_copy_script --target_repo $tgt_repo -o $out_path >> $log_file 2>&1
+
