@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Function to display usage
+usage() {
+    echo "Usage: $0 --source_repo <src_repo_name> --out_repo <out_repo_name> --run <run_id> [--fixed] [--shadowtraffic]"
+    exit 1
+}
+
+# Parse arguments
+SRC_REPO=""
+OUT_REPO=""
+RUN_ID=""
+FIXED=0
+SHADOWTRAFFIC=0
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --source_repo) SRC_REPO="$2"; shift ;;
+        --out_repo) OUT_REPO="$2"; shift ;;
+        --run) RUN_ID="$2"; shift ;;
+        --fixed) FIXED=1 ;;
+        --shadowtraffic) SHADOWTRAFFIC=1 ;;
+        *) echo "Unknown parameter: $1"; usage ;;
+    esac
+    shift
+done
+
+# Check if mandatory arguments are provided
+if [[ -z "$SRC_REPO" || -z "$OUT_REPO" || -z "$RUN_ID" ]]; then
+    echo "Missing required arguments."
+    usage
+fi
+
+# Prepare log file path
+LOG_FILE="$OUT_REPO/logs/`basename $0`.log"
+
+# Base command
+CMD="s2 data instances -s $SRC_REPO/opts -o $OUT_REPO/synth -f $RUN_ID -n 10 -t S2-terminology --formulas S2-data-synth-formulas --log $LOG_FILE"
+
+# Modify the command based on options
+if [[ $FIXED -eq 1 && $SHADOWTRAFFIC -eq 1 ]]; then
+    CMD="$CMD --fixed --usePlaceholderData"
+elif [[ $FIXED -eq 1 ]]; then
+    CMD="$CMD --fixed"
+elif [[ $SHADOWTRAFFIC -eq 1 ]]; then
+    CMD="$CMD --usePlaceholderData"
+fi
+
+# Execute the final command
+echo "Executing: $CMD"
+$CMD
