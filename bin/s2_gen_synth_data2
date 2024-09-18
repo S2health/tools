@@ -34,8 +34,22 @@ fi
 # Prepare log file path
 LOG_FILE="$OUT_REPO/logs/`basename $0`.log"
 
+# Choose correct tool for current OS
+S2_VARIANT=s2
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        S2_VARIANT=s2_linux_x86
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+        S2_VARIANT=s2_macOS
+elif [[ "$OSTYPE" == "msys" ]]; then
+    echo "Windows not supported yet"
+    usage
+else
+    echo "Unsupported OS: $OSTYPE"
+    usage  
+fi
+
 # Base command
-CMD="s2 data instances -s $SRC_REPO/opts -o $OUT_REPO/synth -f $RUN_ID -n 10 -t S2-terminology --formulas S2-data-synth-formulas --log $LOG_FILE"
+CMD="$S2_VARIANT data instances -s $SRC_REPO/opts -o $OUT_REPO/synth -f $RUN_ID -n 10 -t S2-terminology --formulas S2-data-synth-formulas --log $LOG_FILE"
 
 # Modify the command based on options
 if [[ $FIXED -eq 1 && $SHADOWTRAFFIC -eq 1 ]]; then
