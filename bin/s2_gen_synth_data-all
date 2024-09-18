@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Base command
+BASE_CMD="s2_gen_synth_data2 --source_repo S2-models --out_repo S2-test-data --run run_010"
+
+# Call 4 variations of command
+$BASE_CMD
+$BASE_CMD --fixed
+$BASE_CMD --shadowtraffic
+$BASE_CMD --fixed --shadowtraffic
