@@ -3,8 +3,39 @@
 # model command to be executed in root directory containing S2 Health cloned repos.
 #
 
-lib_id=S2-models-demo
-log_file=$lib_id/logs/`basename $0`.log
+USAGE="USAGE: `basename $0` <repo-name>"
 
-echo "adlc --cfg tools/cfg/adlc.cfg -b $lib_id -f csv --report -o $lib_id/reports"  > $log_file
-adlc --cfg tools/cfg/adlc.cfg -b $lib_id -f csv --report -o $lib_id/reports >> $log_file 2>&1
+if [ $# -ne 1 ]; then
+	echo $USAGE
+	exit 1
+fi
+
+lib_id=$1
+if [ ! -d $lib_id ]; then
+	echo "Repo $lib_id doesn't exist"
+	exit 1
+fi
+
+log_dir=$lib_id/logs
+log_file=$log_dir/`basename $0`.log
+
+# just in case the logs directory doesn't yet exist
+mkdir -p $log_dir
+if [ $? -ne 0 ] || [ ! -w $log_dir ]; then
+	echo "Logs dir $log_dir doesn't exist or not writable"
+	exit 1
+fi
+
+adlc_cmd=adlc
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        adlc_cmd=adlc
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+        adlc_cmd=adlc_macosx
+elif [[ "$OSTYPE" == "msys" ]]; then
+        adlc_cmd=adlc.exe
+fi
+
+
+echo "$adlc_cmd --cfg tools/cfg/adlc.cfg -b $lib_id -f csv --report -o $lib_id/reports"  > $log_file
+$adlc_cmd --cfg tools/cfg/adlc.cfg -b $lib_id -f csv --report -o $lib_id/reports >> $log_file 2>&1
+
