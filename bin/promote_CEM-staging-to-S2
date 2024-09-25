@@ -6,8 +6,20 @@
 src=S2-CEM-staging
 src_dir=$src/models/archetypes/Node/Lab
 
-tgt=S2-models-demo
-tgt_dir=$tgt/models/archetypes/Node/Lab
+USAGE="USAGE: `basename $0` <repo-name>"
+
+if [ $# -ne 1 ]; then
+	echo $USAGE
+	exit 1
+fi
+
+lib_id=$1
+if [ ! -d $lib_id ]; then
+	echo "Repo $lib_id doesn't exist"
+	exit 1
+fi
+
+tgt_dir=$lib_id/models/archetypes/Node/Lab
 
 if [ ! -d $src_dir ]; then
 	echo "Source directory $src_dir doesn't exist"

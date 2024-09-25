@@ -3,7 +3,19 @@
 # command to be executed from root directory containing S2 Health cloned repos.
 #
 
-repo_id=S2-models-demo
+USAGE="USAGE: `basename $0` <repo-name>"
+
+if [ $# -ne 1 ]; then
+	echo $USAGE
+	exit 1
+fi
+
+lib_id=$1
+if [ ! -d $lib_id ]; then
+	echo "Repo $lib_id doesn't exist"
+	exit 1
+fi
+
 terminology=loinc
 log_file=$repo_id/logs/inject_${terminology}.log
 

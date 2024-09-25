@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# model command to be executed in root directory containing S2 cloned repos.
+#
+
+build_adl_repo S2-models 0
+
+
