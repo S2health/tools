@@ -1,19 +1,65 @@
 #!/bin/bash
-#
-# Generate instance data for OPTs.
-#
-USAGE="$0 [<run_00N>]"
 
-default_run_id=run_009
+# Function to display usage
+usage() {
+    echo "Usage: $0 --source_repo <src_repo_name> --out_repo <out_repo_name> --run <run_id> [--fixed] [--shadowtraffic]"
+    exit 1
+}
 
-if [[ $# -ne 1 ]]; then
-	echo "Using default run $default_run_id"
-	run_id=$default_run_id
-else
-	run_id=$1
+# Parse arguments
+SRC_REPO=""
+OUT_REPO=""
+RUN_ID=""
+FIXED=0
+SHADOWTRAFFIC=0
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --source_repo) SRC_REPO="$2"; shift ;;
+        --out_repo) OUT_REPO="$2"; shift ;;
+        --run) RUN_ID="$2"; shift ;;
+        --fixed) FIXED=1 ;;
+        --shadowtraffic) SHADOWTRAFFIC=1 ;;
+        *) echo "Unknown parameter: $1"; usage ;;
+    esac
+    shift
+done
+
+# Check if mandatory arguments are provided
+if [[ -z "$SRC_REPO" || -z "$OUT_REPO" || -z "$RUN_ID" ]]; then
+    echo "Missing required arguments."
+    usage
 fi
 
-lib_repo=S2-models-demo
-out_repo=S2-test-data
+# Prepare log file path
+LOG_FILE="$OUT_REPO/logs/`basename $0`.log"
 
-s2_linux_x86 data instances -s $lib_repo/opts -o $out_repo/synth -f $run_id -n 10 -t S2-terminology --formulas S2-data-synth-formulas --log $out_repo/logs/`basename $0`.log
+# Choose correct tool for current OS
+S2_VARIANT=s2
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        S2_VARIANT=s2_linux_x86
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+        S2_VARIANT=s2_macOS
+elif [[ "$OSTYPE" == "msys" ]]; then
+    echo "Windows not supported yet"
+    usage
+else
+    echo "Unsupported OS: $OSTYPE"
+    usage  
+fi
+
+# Base command
+CMD="$S2_VARIANT data instances -s $SRC_REPO/opts -o $OUT_REPO/synth/$SRC_REPO -f $RUN_ID -n 10 -t S2-terminology --formulas S2-data-synth-formulas --log $LOG_FILE"
+
+# Modify the command based on options
+if [[ $FIXED -eq 1 && $SHADOWTRAFFIC -eq 1 ]]; then
+    CMD="$CMD --fixed --usePlaceholderData"
+elif [[ $FIXED -eq 1 ]]; then
+    CMD="$CMD --fixed"
+elif [[ $SHADOWTRAFFIC -eq 1 ]]; then
+    CMD="$CMD --usePlaceholderData"
+fi
+
+# Execute the final command
+echo "Executing: $CMD"
+$CMD

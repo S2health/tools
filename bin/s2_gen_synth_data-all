@@ -28,7 +28,7 @@ if [ -z "$SOURCE_REPO" ]; then
 fi
 
 # Base command with dynamic source_repo
-BASE_CMD="s2_gen_synth_data2 --source_repo $SOURCE_REPO --out_repo S2-test-data --run run_010"
+BASE_CMD="s2_gen_synth_data --source_repo $SOURCE_REPO --out_repo S2-test-data --run run_010"
 
 # Call 4 variations of the command
 $BASE_CMD
