@@ -1,9 +1,23 @@
 #!/bin/bash
 #
-# command to be executed from root directory containing S2 Health cloned repos.
+# Inject terminology bindings into model files. Usually used only after a
+# regeneration of model files from some source (e.g. openEHR CKM) that
+# doesn't have the bindings
 #
 
-lib_id=S2-models-demo
+USAGE="USAGE: `basename $0` <repo-name>"
+
+if [ $# -ne 1 ]; then
+	echo $USAGE
+	exit 1
+fi
+
+lib_id=$1
+if [ ! -d $lib_id ]; then
+	echo "Repo $lib_id doesn't exist"
+	exit 1
+fi
+
 terminologies=( loinc rxnorm openehr s2 snomed ucum )
 
 for i in "${terminologies[@]}" ; do

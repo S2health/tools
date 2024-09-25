@@ -1,0 +1,72 @@
+#!/bin/bash
+#
+# Output flat JSONs for all archetypes; for templtes, JSON OPTs
+#
+
+USAGE="USAGE: `basename $0` --source_repo <repo-name>"
+
+lib_id=""
+out_repo=S2-exported
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --source_repo) 
+			lib_id="$2"; 
+			shift 
+			;;
+        *) 
+			echo "Unknown parameter: $1"; 
+			echo $USAGE
+			exit 1 
+			;;
+    esac
+    shift
+done
+
+if [ -z "$lib_id" ]; then
+	echo $USAGE
+	exit 1
+fi
+
+if [ ! -d $lib_id ]; then
+	echo "Repo $lib_id doesn't exist"
+	exit 1
+fi
+
+log_dir=$out_repo/$lib_id/logs
+log_file=$log_dir/`basename $0`.log
+
+out_path=$out_repo/$lib_id/json/flat
+
+adlc_cmd=adlc
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        adlc_cmd=adlc
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+        adlc_cmd=adlc_macosx
+elif [[ "$OSTYPE" == "msys" ]]; then
+        adlc_cmd=adlc.exe
+else
+	echo "No binary found for OS type $OSTYPE"
+	exit 1
+fi
+
+# create log dir if it does not exist
+mkdir -p $log_dir
+if [ $? -ne 0 ] || [ ! -w $log_dir ]; then
+	echo "Logs dir $log_dir doesn't exist or not writable"
+	exit 1
+fi
+
+# clean the target location
+rm -f $out_path/*.json
+
+# main command - writes out all flat-form archetypes, and templates in flat (but not OPT) form
+echo -e "\n======== export flat JSON =========" > $log_file
+echo "$adlc_cmd --cfg tools/cfg/adlc.cfg -b $lib_id --export --flat -f json -o $out_path" >> $log_file
+$adlc_cmd --cfg tools/cfg/adlc.cfg -b $lib_id --export --flat -f json -o $out_path >> $log_file 2>&1
+
+# run again, but write out templates in OPT form; overwrites the flat form, which no-one uses
+echo -e "\n======== export JSON OPTs =========" >> $log_file
+echo "$adlc_cmd --cfg tools/cfg/adlc.cfg -b $lib_id --export --opts --flat -f json -o $out_path" >> $log_file
+$adlc_cmd --cfg tools/cfg/adlc.cfg -b $lib_id --export --opts --flat -f json -o $out_path >> $log_file 2>&1
+
