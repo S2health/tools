@@ -1,10 +1,38 @@
 #!/bin/bash
 
-# Base command
-BASE_CMD="s2_gen_synth_data2 --source_repo S2-models --out_repo S2-test-data --run run_010"
+# Function to display usage
+usage() {
+  echo "Usage: $0 --source_repo <source_repo>"
+  echo "  --source_repo: Specify the source repository (e.g., S2-models)"
+  exit 1
+}
 
-# Call 4 variations of command
+# Parse command-line arguments
+if [ "$#" -ne 2 ]; then
+  usage
+fi
+
+while [ "$1" != "" ]; do
+  case $1 in
+    --source_repo )    shift
+                       SOURCE_REPO=$1
+                       ;;
+    * )                usage
+  esac
+  shift
+done
+
+# Check if source_repo is set
+if [ -z "$SOURCE_REPO" ]; then
+  usage
+fi
+
+# Base command with dynamic source_repo
+BASE_CMD="s2_gen_synth_data2 --source_repo $SOURCE_REPO --out_repo S2-test-data --run run_010"
+
+# Call 4 variations of the command
 $BASE_CMD
 $BASE_CMD --fixed
 $BASE_CMD --shadowtraffic
 $BASE_CMD --fixed --shadowtraffic
+
