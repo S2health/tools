@@ -15,7 +15,7 @@ inputs:
     description: The PATH to set to run scripts in tools repo
     required: true
   scripts_list:
-    description: A list of scripts that needs to be run in the format "script1 --arg_name1 args1 --arg_name2 arg2 script2 args3"
+    description: A list of scripts that needs to be run in the format "script1 script2"
     required: true
   target_repo_name:
     description: Name of the target repo to create the git branch and PR
@@ -40,42 +40,12 @@ runs:
       working-directory: ./
       shell: bash
       run: |
-        declare -A scripts_args
-        script_list=( ${{ inputs.scripts_list }} )
-        script_len=${#script_list[@]}
-        i=0
         export ${{ inputs.s2_tools_path }}
         echo $PATH
-
-        # Loop through script list 
-        while [[ $i -lt $script_len ]]; do
-          script="${script_list[$i]}"
-          ((i++))
-          args=()
-
-          # Checks if the script is executable if not add it to list of arguments
-          while [[ $i -lt $script_len && ! -x "${script_list[$i]}" ]]; do
-            current_args+=("${script_list[$i]}")
-            if [[ "$current_arg" == -* ]]; then
-              args+=("${current_arg}")
-              ((i++))
-              if [[ $i -lt $num_args && "${script_list[$i]}" != -* ]]; then
-                args+=("${script_list[$i]}")
-                ((i++))
-              fi
-            else
-              args+=("$current_arg")
-              ((i++))
-            fi
-          done
-
-          scripts_args["$scripts"]="${args[*]}"
-        done
-
-        for script in "${scripts_args[@]}"; do
-
-          echo "Running $script with args: ${scripts_args[$script]}"
-          bash ./tools/bin/$script ${scripts_args[$script]}
+        arr=( ${{ inputs.scripts_list }} )
+        for script in "${arr[@]}"; do
+          echo "$script"
+          bash ./tools/bin/$script
         done
 
     - name: Push the new branch with changes after running scripts
