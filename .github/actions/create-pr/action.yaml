@@ -55,11 +55,11 @@ runs:
 
           # Checks if the script is executable if not add it to list of arguments
           while [[ $i -lt $script_len && ! -x "${script_list[$i]}" ]]; do
-            current_args+=("${script_list[$i]}")
+            current_arg="${script_list[$i]}"
             if [[ "$current_arg" == -* ]]; then
               args+=("${current_arg}")
               ((i++))
-              if [[ $i -lt $num_args && "${script_list[$i]}" != -* ]]; then
+              if [[ $i -lt $script_len && "${script_list[$i]}" != -* ]]; then
                 args+=("${script_list[$i]}")
                 ((i++))
               fi
@@ -72,7 +72,7 @@ runs:
           scripts_args["$scripts"]="${args[*]}"
         done
 
-        for script in "${scripts_args[@]}"; do
+        for script in "${!scripts_args[@]}"; do
 
           echo "Running $script with args: ${scripts_args[$script]}"
           bash ./tools/bin/$script ${scripts_args[$script]}
