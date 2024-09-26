@@ -32,7 +32,7 @@ if [[ -z "$SRC_REPO" || -z "$OUT_REPO" || -z "$RUN_ID" ]]; then
 fi
 
 # Prepare log file path
-LOG_FILE="$OUT_REPO/logs/`basename $0`.log"
+LOG_FILE="$OUT_REPO/synth/$SRC_REPO/$RUN_ID/logs/`basename $0`.log"
 
 # Choose correct tool for current OS
 S2_VARIANT=s2
