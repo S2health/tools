@@ -12,10 +12,39 @@
 #
 #
 
-USAGE="USAGE: `basename $0`"
+USAGE="USAGE: `basename $0` --source_repo <repo-name>"
 
-src_repo=S2-terminology
+src_repo=""
 infile=S2_Elements-LOINC_Extension_map_master.csv
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --source_repo) 
+			src_repo="$2"; 
+			shift 
+			;;
+        *) 
+			echo "Unknown parameter: $1"; 
+			echo $USAGE
+			exit 1 
+			;;
+    esac
+    shift
+done
+
+if [ -z "$src_repo" ]; then
+	echo $USAGE
+	exit 1
+fi
+
+if [ ! -d $src_repo ]; then
+	echo "Repo $src_repo doesn't exist"
+	exit 1
+fi
+
+log_dir=$src_repo/logs
+log_file=$log_dir/`basename $0`.log
+
 inpath=$src_repo/LOINC/$infile
 
 if [ ! -r "$inpath" ]; then
@@ -23,14 +52,15 @@ if [ ! -r "$inpath" ]; then
 	exit 1
 fi
 
-tgt_lib_id=S2-models-demo
-outdir=$tgt_lib_id/injection
+outdir=$src_repo/injection
 outfile=loinc_master.csv
 outpath=$outdir/$outfile
 
 
-if [ ! -d "$outdir" ]; then
-	echo "$outdir does not exist; executing from correct location?"
+# make sure the output directory exists
+mkdir -p $outdir
+if [ $? -ne 0 ] || [ ! -w $outdir ]; then
+	echo "Output dir $outdir doesn't exist or not writable"
 	exit 1
 fi
 
@@ -42,7 +72,7 @@ while read -r line
 		# qline="${line//\\,/XXXX}"
 
 		# the following will catch two commas in a quoted field
-		qline=`echo $line | sed -e 's/,"\(.*\),\(.*\)",/,"\1XXXX\2",/' -e 's/,"\(.*\),\(.*\)",/,"\1XXXX\2",/'`
+		qline=`echo $line | awk -F'"' -v OFS='' '{ for (i=2; i<=NF; i+=2) gsub(",", "XXXX", $i) } 1'`
 		loinc_code=`echo "$qline" | cut -d',' -f4`
 
 		# ignore long strings which are GUIDs
@@ -53,7 +83,7 @@ while read -r line
 			new="$arch_id,$arch_code,$loinc_code" 
 			#
 			# use this for backslash quoting
-			# echo "${new//XXXX/\\,}" >> $outfile
+			# echo "${new//XXXX/\\,}" >> $tmpfile
 			echo "${new//XXXX/,}" >> $tmpfile
 		#fi
 	done < $inpath

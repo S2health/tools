@@ -1,24 +1,69 @@
 #!/bin/bash
 #
-# command to be executed from root directory containing S2 Health cloned repos.
+# inject from S2-terminology/injection/loinc_master.csv into model 
+# files in the current repo
 #
 
-USAGE="USAGE: `basename $0` <repo-name>"
+USAGE="USAGE: `basename $0` --source_repo <repo-name>"
 
-if [ $# -ne 1 ]; then
+lib_id=""
+terminology_repo=S2-terminology
+terminology=loinc
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --source_repo) 
+			lib_id="$2"; 
+			shift 
+			;;
+        *) 
+			echo "Unknown parameter: $1"; 
+			echo $USAGE
+			exit 1 
+			;;
+    esac
+    shift
+done
+
+if [ -z "$lib_id" ]; then
 	echo $USAGE
 	exit 1
 fi
 
-lib_id=$1
 if [ ! -d $lib_id ]; then
 	echo "Repo $lib_id doesn't exist"
 	exit 1
 fi
 
-terminology=loinc
-log_file=$repo_id/logs/`basename $0`.log
+log_dir=$lib_id/logs
+log_file=$log_dir/`basename $0`.log
 
-echo "adlc -q --cfg tools/cfg/adlc.cfg -b $repo_id --inject_term_bindings ${terminology} -i $repo_id/injection/${terminology}_master.csv" > $log_file
-adlc -q --cfg tools/cfg/adlc.cfg -b $repo_id --inject_term_bindings ${terminology} -i $repo_id/injection/${terminology}_master.csv >> $log_file 2>&1
+# create log dir if it does not exist
+mkdir -p $log_dir
+if [ $? -ne 0 ] || [ ! -w $log_dir ]; then
+	echo "Logs dir $log_dir doesn't exist or not writable"
+	exit 1
+fi
+
+adlc_cmd=adlc
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        adlc_cmd=adlc
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+        adlc_cmd=adlc_macosx
+elif [[ "$OSTYPE" == "msys" ]]; then
+        adlc_cmd=adlc.exe
+else
+	echo "No binary found for OS type $OSTYPE"
+	exit 1
+fi
+
+src_file=$terminology_repo/injection/${terminology}_master.csv
+if [ ! -f $src_file ]; then
+	echo "Repo $src_file doesn't exist"
+	exit 1
+fi
+
+
+echo "$adlc_cmd -q --cfg tools/cfg/adlc.cfg -b $lib_id --inject_term_bindings ${terminology} -i $src_file" > $log_file
+$adlc_cmd -q --cfg tools/cfg/adlc.cfg -b $lib_id --inject_term_bindings ${terminology} -i $src_file >> $log_file 2>&1
 
