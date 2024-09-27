@@ -1,0 +1,96 @@
+#!/bin/bash
+#
+# Generate OPTs for a model repository
+#
+
+USAGE="USAGE: `basename $0` --source_repo <repo-name>"
+lib_id=""
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --source_repo) 
+			lib_id="$2"; 
+			shift 
+			;;
+        *) 
+			echo "Unknown parameter: $1"; 
+			echo $USAGE
+			exit 1 
+			;;
+    esac
+    shift
+done
+
+if [ -z "$lib_id" ]; then
+	echo $USAGE
+	exit 1
+fi
+
+if [ ! -d $lib_id ]; then
+	echo "Repo $lib_id doesn't exist"
+	exit 1
+fi
+
+# ------------------------
+
+if [ ! -d S2-BMM ]; then
+	echo "Repo S2-BMM doesn't exist"
+	exit 1
+else
+	find . -name '*.bmm' -print
+fi
+
+
+
+
+# ----------------------------
+
+log_dir=$lib_id/logs
+log_file=$log_dir/`basename $0`.log
+
+adlc_cmd=adlc
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+	adlc_cmd=adlc
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+	adlc_cmd=adlc_macosx
+elif [[ "$OSTYPE" == "msys" ]]; then
+	adlc_cmd=adlc.exe
+else
+	echo "No binary found for OS type $OSTYPE"
+	exit 1
+fi
+
+# make sure the logs directory doesn't yet exist
+mkdir -p $log_dir
+if [ $? -ne 0 ] || [ ! -w $log_dir ]; then
+	echo "Logs dir $log_dir doesn't exist or not writable"
+	exit 1
+fi
+
+
+echo "======== Running export jobs ========"  > $log_file
+
+
+#
+# generate OPTs
+#
+rm -f $lib_id/opts/*.*
+echo -e "\n======== export OPTs ========" >> $log_file
+echo "$adlc_cmd --cfg tools/cfg/adlc.cfg -b $lib_id --export --flat -f adl --opts --rm_multiplicities -o $lib_id/opts"  >> $log_file
+$adlc_cmd --cfg tools/cfg/adlc.cfg -b $lib_id --export --flat -f adl --opts --rm_multiplicities -o $lib_id/opts >> $log_file 2>&1
+
+
+#
+# generate reports
+#
+echo -e "\n======== export reports =========" >> $log_file
+echo "$adlc_cmd --cfg tools/cfg/adlc.cfg -b $lib_id -f csv --report -o $lib_id/reports"  >> $log_file
+$adlc_cmd --cfg tools/cfg/adlc.cfg -b $lib_id -f csv --report -o $lib_id/reports >> $log_file 2>&1
+
+#
+# export term bindings
+#
+echo -e "\n======== export term bindings ========" >> $log_file
+echo "$adlc_cmd --cfg tools/cfg/adlc.cfg -b $lib_id --export_term_bindings -o $lib_id/term_bindings" >> $log_file
+$adlc_cmd --cfg tools/cfg/adlc.cfg -b $lib_id --export_term_bindings -o $lib_id/term_bindings >> $log_file 2>&1
+
