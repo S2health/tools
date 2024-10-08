@@ -28,7 +28,10 @@ if [ -z "$SOURCE_REPO" ]; then
 fi
 
 # Base command with dynamic source_repo
-BASE_CMD="s2_gen_synth_data --source_repo $SOURCE_REPO --out_repo S2-test-data --run run_010"
+RUN_ID=run_010
+OUT_REPO=S2-test-data
+BASE_CMD="s2_gen_synth_data --source_repo $SOURCE_REPO --out_repo $OUT_REPO --run $RUN_ID"
+BUILD_MANIFEST_PATH=$OUT_REPO/synth/$SOURCE_REPO/$RUN_ID/build_manifest.csv
 
 # Call 4 variations of the command
 $BASE_CMD
@@ -36,3 +39,19 @@ $BASE_CMD --fixed
 $BASE_CMD --shadowtraffic
 $BASE_CMD --fixed --shadowtraffic
 
+# generate build manifest
+> $BUILD_MANIFEST_PATH
+
+INPUT_REPOS=("$lib_id" "S2-terminology" "S2-data-synth-formulas" "tools" "Medical-tools")
+for i in ${INPUT_REPOS[@]}; do
+	if [ `git -C $i tag | wc -l` -gt 0 ]; then
+	    tag=`git -C $i describe --tags --abbrev=0`
+	else
+		tag="unknown"
+	fi
+	echo "$i,$tag" >> $BUILD_MANIFEST_PATH
+done
+
+echo "wrote build manifest to $BUILD_MANIFEST_PATH"
+
+	

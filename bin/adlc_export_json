@@ -37,6 +37,7 @@ log_dir=$out_repo/$lib_id/logs
 log_file=$log_dir/`basename $0`.log
 
 out_path=$out_repo/$lib_id/json/flat
+build_manifest_path=$out_repo/$lib_id/build_manifest.csv
 
 adlc_cmd=adlc
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -70,3 +71,16 @@ echo -e "\n======== export JSON OPTs =========" >> $log_file
 echo "$adlc_cmd --cfg tools/cfg/adlc.cfg -b $lib_id --export --opts --flat -f json -o $out_path" >> $log_file
 $adlc_cmd --cfg tools/cfg/adlc.cfg -b $lib_id --export --opts --flat -f json -o $out_path >> $log_file 2>&1
 
+# generate build manifest
+> $build_manifest_path
+
+input_repos=("$lib_id" "S2-BMM" "S2-terminology" "tools" "tools-binary")
+for i in ${input_repos[@]}; do
+	if [ `git -C $i tag | wc -l` -gt 0 ]; then
+	    tag=`git -C $i describe --tags --abbrev=0`
+	else
+		tag="unknown"
+	fi
+	echo "$i,$tag" >> $build_manifest_path
+done
+	
