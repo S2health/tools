@@ -4,7 +4,7 @@
 # files in the current repo
 #
 
-USAGE="USAGE: `basename $0` --source_repo <repo-name>"
+USAGE="USAGE: `basename $0` --target_repo <repo-name>"
 
 lib_id=""
 terminology_repo=S2-terminology
@@ -12,7 +12,7 @@ terminology=loinc
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --source_repo) 
+        --target_repo) 
 			lib_id="$2"; 
 			shift 
 			;;
