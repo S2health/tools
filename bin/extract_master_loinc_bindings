@@ -1,9 +1,9 @@
 #!/bin/bash
 #
 # Extract from master spreadsheet, in CSV form, the following fields 
-#	4 - LOINC code
-#   9 - archetype id
-#	10 - id-code within archetype
+#	3 - LOINC code
+#   5 - archetype id
+#	6 - id-code within archetype
 #
 # and write to a CSV in the order 9, 10, 4
 #
@@ -71,14 +71,14 @@ while read -r line
 		# use this for backslash quoting
 		# qline="${line//\\,/XXXX}"
 
-		# the following will catch two commas in a quoted field
+		# the following will catch all commas in a quoted field
 		qline=`echo $line | awk -F'"' -v OFS='' '{ for (i=2; i<=NF; i+=2) gsub(",", "XXXX", $i) } 1'`
-		loinc_code=`echo "$qline" | cut -d',' -f4`
+		loinc_code=`echo "$qline" | cut -d',' -f3`
 
 		# ignore long strings which are GUIDs
 		#if [ ${#loinc_code} -lt 8 ]; then
-			arch_id=`echo "$qline" | cut -d',' -f9`
-			arch_code=`echo "$qline" | cut -d',' -f10`
+			arch_id=`echo "$qline" | cut -d',' -f5`
+			arch_code=`echo "$qline" | cut -d',' -f6`
 
 			new="$arch_id,$arch_code,$loinc_code" 
 			#
