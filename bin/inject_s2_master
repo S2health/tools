@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+# command to be executed from root directory containing S2 Health cloned repos.
+#
+
+inject_terminology_master --target_repo S2-models --terminology s2
+
