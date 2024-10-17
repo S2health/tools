@@ -45,7 +45,7 @@ $BASE_CMD --fixed --shadowtraffic
 INPUT_REPOS=("$lib_id" "S2-terminology" "S2-data-synth-formulas" "tools" "Medical-tools")
 for i in ${INPUT_REPOS[@]}; do
 	# for now assume that fetch tags is needed, although should be done by clone/checkout
-	git -C $i featch --tags
+	# git -C $i fetch --tags
 	
 	# get the latest tag
 	if [ `git -C $i tag | wc -l` -gt 0 ]; then
