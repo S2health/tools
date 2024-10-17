@@ -42,7 +42,7 @@ $BASE_CMD --fixed --shadowtraffic
 # generate build manifest
 > $BUILD_MANIFEST_PATH
 
-INPUT_REPOS=("$lib_id" "S2-terminology" "S2-data-synth-formulas" "tools" "Medical-tools")
+INPUT_REPOS=("$SOURCE_REPO" "S2-terminology" "S2-data-synth-formulas" "S2-BMM" "tools" "Medical-tools")
 for i in ${INPUT_REPOS[@]}; do
 	# for now assume that fetch tags is needed, although should be done by clone/checkout
 	git -C $i featch --tags
