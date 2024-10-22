@@ -86,7 +86,7 @@ input_repos=("$lib_id" "S2-BMM" "S2-terminology" "tools" "tools-binary")
 for i in ${input_repos[@]}; do
 
 	# for now assume that fetch tags is needed, although should be done by clone/checkout
-	# git -C $i fetch --tags
+	git -C $i fetch --tags
 	
 	# get the latest tag
 	if [ `git -C $i tag | wc -l` -gt 0 ]; then
